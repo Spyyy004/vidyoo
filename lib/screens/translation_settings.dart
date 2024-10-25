@@ -312,15 +312,6 @@ class _TranslationSetupScreenState extends State<TranslationSetupScreen> {
 
   void _startTranslation() {
     // Proceed to processing screen
-    Navigator.pushNamed(
-      context,
-      '/translate/processing',
-      arguments: {
-        'language': selectedLanguage,
-        'voiceOption': selectedVoiceOption,
-        'subtitleOption': selectedSubtitleOption,
-        'accent': selectedAccent,
-      },
-    );
+
   }
 }

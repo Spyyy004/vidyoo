@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:vidyoo/screens/smart_edit_result.dart';
 import 'package:vidyoo/screens/upload.dart';
+import '../services/openai_service.dart';
 import '../utils/consts.dart';
 import 'dart:html' as html;
 class SmartEditSetup extends StatefulWidget {
@@ -32,7 +34,8 @@ class _SmartEditSetupState extends State<SmartEditSetup> {
     'Find all mentions of pricing',
     'Extract tutorial sections',
   ];
-
+  final OpenAIService _openAIService = OpenAIService();
+  bool _isProcessing = false;
   @override
   void dispose() {
     _commandController.dispose();
@@ -172,7 +175,7 @@ class _SmartEditSetupState extends State<SmartEditSetup> {
                       const SizedBox(width: 16),
                       ElevatedButton(
                         onPressed: _commandController.text.isNotEmpty
-                            ? (){}
+                            ? (_isProcessing ? null : _startProcessing)
                             : null,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: VidyooTheme.primary,
@@ -184,9 +187,24 @@ class _SmartEditSetupState extends State<SmartEditSetup> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            const Text('Start Processing',style: TextStyle(color: Colors.white),),
-                            const SizedBox(width: 8),
-                            const Icon(Icons.arrow_forward, size: 16),
+                            if (_isProcessing)
+                              Container(
+                                width: 20,
+                                height: 20,
+                                margin: const EdgeInsets.only(right: 12),
+                                child: const CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                                ),
+                              )
+                            else ...[
+                              const Text(
+                                'Start Processing',
+                                style: TextStyle(color: Colors.white),
+                              ),
+                              const SizedBox(width: 8),
+                              const Icon(Icons.arrow_forward, size: 16),
+                            ],
                           ],
                         ),
                       ),
@@ -357,8 +375,102 @@ class _SmartEditSetupState extends State<SmartEditSetup> {
     );
   }
 
+  Future<void> _startProcessing() async {
+    setState(() {
+      _isProcessing = true;
+    });
 
+    try {
+      // Show transcription status
+      _showProcessingStatus('Generating video transcription...');
 
+      // Step 1: Generate transcription
+      final transcription = await _openAIService.generateTranscription(
+        widget.videoFile,
+      );
+
+      if (!mounted) return;
+      print(transcription);
+      print("STEP 1-----");
+      // Show analysis status
+      _showProcessingStatus('Analyzing content...');
+
+      // Step 2: Analyze transcription
+      // final settings = {
+      //   'generateSocialFormats': generateSocialFormats,
+      //   'addCaptions': addCaptions,
+      //   'limitOutput': addBackgroundMusic,
+      //   'exportHighQuality': exportHighQuality,
+      // };
+
+      final analysis = await _openAIService.analyzeTranscription(
+        transcription: transcription,
+        command: _commandController.text,
+
+      );
+      print(analysis);
+      print("STEP 2-----");
+      if (!mounted) return;
+
+      // Convert to strongly-typed object
+      // final instructions = VideoEditingInstructions.fromJson(analysis);
+
+      // Navigate to processing screen
+      Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => VideoSegmentsScreen(
+              segments: analysis['actions'],
+              videoFile: widget.videoFile,
+            )),
+          );
+
+    } catch (e) {
+      if (!mounted) return;
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Error: ${e.toString()}'),
+          backgroundColor: Colors.red,
+          behavior: SnackBarBehavior.floating,
+          action: SnackBarAction(
+            label: 'Retry',
+            textColor: Colors.white,
+            onPressed: _startProcessing,
+          ),
+        ),
+      );
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isProcessing = false;
+        });
+      }
+    }
+  }
+
+  void _showProcessingStatus(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2,
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Text(message),
+          ],
+        ),
+        duration: const Duration(seconds: 60),
+        behavior: SnackBarBehavior.floating,
+      ),
+    );
+  }
 }
 
 
