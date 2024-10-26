@@ -46,6 +46,7 @@ dependencies:
   google_sign_in:
   video_player:
   webview_flutter:
+  lottie:
 
 dev_dependencies:
   flutter_test:

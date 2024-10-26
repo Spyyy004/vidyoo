@@ -1,15 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:video_player/video_player.dart';
+import 'package:vidyoo/screens/translation_success.dart';
 import 'package:vidyoo/screens/upload.dart';
+import '../services/translation_service.dart';
 import '../utils/consts.dart';
 import 'dart:html' as html;
 
 class TranslationSetupScreen extends StatefulWidget {
   final dynamic videoFile;
+  final dynamic videoUrl;
 
   const TranslationSetupScreen({
     super.key,
     required this.videoFile,
+    required this.videoUrl
   });
 
   @override
@@ -21,6 +26,7 @@ class _TranslationSetupScreenState extends State<TranslationSetupScreen> {
   String? selectedVoiceOption;
   String? selectedSubtitleOption;
   String? selectedAccent;
+
   late VideoPlayerController videoPlayerController;
 
   final List<String> commonLanguages = [
@@ -28,6 +34,21 @@ class _TranslationSetupScreenState extends State<TranslationSetupScreen> {
     'Bengali', 'Chinese (Mandarin)', 'Hindi', 'Telugu',
     'Marwari','Spanish','French'
   ];
+  final Map<String, String> languageCodes = {
+    'Marathi': 'mr',
+    'Gujarati': 'gu',
+    'Tamil': 'ta',
+    'Malayalam': 'ml',
+    'Japanese': 'ja',
+    'Bengali': 'bn',
+    'Chinese (Mandarin)': 'zh',
+    'Hindi': 'hi',
+    'Telugu': 'te',
+    'Marwari': 'mwr', // Note: Marwari does not have an ISO 639-1 code, so 'mwr' is an ISO 639-3 code
+    'Spanish': 'es',
+    'French': 'fr',
+  };
+  bool isVideoProcess = false;
 
   Future<void> _initializeVideo() async {
 
@@ -47,6 +68,74 @@ class _TranslationSetupScreenState extends State<TranslationSetupScreen> {
     }
   }
 
+  Future<void> _startTranslation() async {
+
+    setState(() {
+       isVideoProcess = true;
+    });
+
+    try {
+      final translationService = TranslationService();
+      dynamic videoUrl;
+      print(widget.videoUrl);
+      if(widget.videoUrl != "") {
+         videoUrl = await translationService.translateVideo(
+          videoUrl: widget.videoUrl,
+          targetLanguage: languageCodes[selectedLanguage] ?? '',
+          ageCategory: '18-25',
+          subtitleCategory: 'none' ?? '',
+          voiceCategory: 'ai' ?? '',
+        );
+      }
+      else{
+        videoUrl = await translationService.translateVideoUpload(
+          videoFile: widget.videoFile,
+          targetLanguage: languageCodes[selectedLanguage] ?? '',
+          ageCategory: '18-25',
+          subtitleCategory: 'none' ?? '',
+          voiceCategory: 'ai' ?? '',
+        );
+      }
+      print(videoUrl);
+      if (mounted) {
+        setState(() {
+          isVideoProcess = false;
+        });
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => TranslationResultScreen(
+              videoData: videoUrl,
+              settings: {
+                'targetLanguage': selectedLanguage ?? '',
+                'ageCategory': '18-25' ?? '',
+                'subtitleCategory': 'none' ?? '',
+                'voiceCategory': 'ai' ?? '',
+              },
+            ),
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        print(e);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            behavior: SnackBarBehavior.floating,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          isVideoProcess = false;
+        });
+      }
+    }
+  }
+
   @override
   void initState() {
     // TODO: implement initState
@@ -57,7 +146,12 @@ class _TranslationSetupScreenState extends State<TranslationSetupScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Row(
+      body: isVideoProcess ? Center(
+          child: LottieBuilder.network(
+              width: 400,
+              height: 400,
+              "https://raw.githubusercontent.com/xvrh/lottie-flutter/master/example/assets/Mobilo/A.json")
+      ) : Row(
         children: [
           // Left side - Video Preview
           Expanded(
@@ -310,8 +404,6 @@ class _TranslationSetupScreenState extends State<TranslationSetupScreen> {
         selectedSubtitleOption != null;
   }
 
-  void _startTranslation() {
-    // Proceed to processing screen
+  // In your TranslationSetup page
 
-  }
 }

@@ -114,7 +114,11 @@ class _LandingPageState extends State<LandingPage> {
                   return UploadPage();
                 }));
               }),
-              _buildCTAButton('Smart Edit', Colors.white, () {}, outlined: true),
+              _buildCTAButton('Smart Edit', Colors.white, () {
+                Navigator.push(context, MaterialPageRoute(builder: (context) {
+                  return UploadPage();
+                }));
+              }, outlined: true),
             ],
           ),
         ],

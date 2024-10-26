@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:video_player/video_player.dart';
 import 'package:vidyoo/screens/smart_edit_result.dart';
 import 'package:vidyoo/screens/upload.dart';
@@ -24,6 +25,7 @@ class _SmartEditSetupState extends State<SmartEditSetup> {
   bool addCaptions = false;
   bool addBackgroundMusic = false;
   bool exportHighQuality = false;
+  bool isLoading = false;
   late VideoPlayerController videoPlayerController;
   // Predefined commands for quick selection
   final List<String> suggestedCommands = [
@@ -70,7 +72,11 @@ class _SmartEditSetupState extends State<SmartEditSetup> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Row(
+      body: _isProcessing ? Center(
+          child: LottieBuilder.network(
+              width: 400,
+              height: 400,
+              "https://raw.githubusercontent.com/xvrh/lottie-flutter/master/example/assets/Mobilo/A.json")) : Row(
         children: [
           // Left side - Video Preview
           Expanded(
@@ -393,7 +399,7 @@ class _SmartEditSetupState extends State<SmartEditSetup> {
       print(transcription);
       print("STEP 1-----");
       // Show analysis status
-      _showProcessingStatus('Analyzing content...');
+      // _showProcessingStatus('Analyzing content...');
 
       // Step 2: Analyze transcription
       // final settings = {

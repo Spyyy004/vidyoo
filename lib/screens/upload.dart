@@ -62,6 +62,7 @@ class _UploadPageState extends State<UploadPage> {
 
   @override
   void dispose() {
+    videoPlayerController.pause();
     videoPlayerController.dispose();
     super.dispose();
   }
@@ -210,7 +211,7 @@ SizedBox(height: 8,),
             children: [
               _buildFeatureButton('Translate Video', Icons.translate, () {
                 Navigator.push(context, MaterialPageRoute(builder: (context){
-                  return TranslationSetupScreen(videoFile: videoBytes);
+                  return TranslationSetupScreen(videoFile: videoBytes,videoUrl: _urlController.text,);
                 }));
               }),
               const SizedBox(width: 16),

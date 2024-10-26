@@ -112,7 +112,7 @@ Based on the transcription, identify the relevant segments and return ONLY a JSO
             }
           ],
           'temperature': 0.7,
-          'max_tokens': 1000,
+
         }),
       );
 
@@ -225,7 +225,7 @@ Return the response in the following JSON format:
             }
           ],
           'temperature': 0.7,
-          'max_tokens': 1500,
+
         }),
       );
 
