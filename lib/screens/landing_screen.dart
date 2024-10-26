@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:vidyoo/screens/features.dart';
+import 'package:vidyoo/screens/pricing.dart';
 import 'package:vidyoo/screens/sign_up_prompt.dart';
 import 'package:vidyoo/screens/upload.dart';
 import '../utils/consts.dart';
@@ -52,9 +53,17 @@ class _LandingPageState extends State<LandingPage> {
   Widget _buildDesktopMenu() {
     return Row(
       children: [
-        _buildNavItem('Features'),
-        _buildNavItem('How it Works'),
-        _buildNavItem('Pricing'),
+        _buildNavItem('Features',(){
+          Navigator.push(context, MaterialPageRoute(builder: (context){
+            return FeaturesPage();
+          }));
+        }),
+
+        _buildNavItem('Pricing',(){
+          Navigator.push(context, MaterialPageRoute(builder: (context){
+            return PricingPage();
+          }));
+        }),
         const SizedBox(width: 24),
         ElevatedButton(
           onPressed: () {
@@ -181,15 +190,11 @@ class _LandingPageState extends State<LandingPage> {
     );
   }
 
-  Widget _buildNavItem(String title) {
+  Widget _buildNavItem(String title, dynamic onPressed) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: TextButton(
-        onPressed: (){
-          Navigator.push(context, MaterialPageRoute(builder: (context){
-            return FeaturesPage();
-          }));
-        },
+        onPressed: onPressed,
         child: Text(
           title,
           style: VidyooTheme.bodyDefault.copyWith(color: VidyooTheme.textDark),

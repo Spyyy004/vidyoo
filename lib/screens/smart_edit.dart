@@ -73,10 +73,15 @@ class _SmartEditSetupState extends State<SmartEditSetup> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: _isProcessing ? Center(
-          child: LottieBuilder.network(
-              width: 400,
-              height: 400,
-              "https://raw.githubusercontent.com/xvrh/lottie-flutter/master/example/assets/Mobilo/A.json")) : Row(
+          child: Column(
+            children: [
+              LottieBuilder.network(
+                  width: 400,
+                  height: 400,
+                  "https://lottie.host/d13717e3-a162-4a62-8554-a1df7266b2dc/QqfG3OW9e9.json"),
+              Text("This might take some time. Please wait.")
+            ],
+          )) : Row(
         children: [
           // Left side - Video Preview
           Expanded(

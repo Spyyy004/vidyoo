@@ -41,10 +41,10 @@ class _TranslationSetupScreenState extends State<TranslationSetupScreen> {
     'Malayalam': 'ml',
     'Japanese': 'ja',
     'Bengali': 'bn',
-    'Chinese (Mandarin)': 'zh',
+    'punjabi': 'pa',
     'Hindi': 'hi',
     'Telugu': 'te',
-    'Marwari': 'mwr', // Note: Marwari does not have an ISO 639-1 code, so 'mwr' is an ISO 639-3 code
+    'Assamese': 'as', // Note: Marwari does not have an ISO 639-1 code, so 'mwr' is an ISO 639-3 code
     'Spanish': 'es',
     'French': 'fr',
   };
@@ -150,7 +150,7 @@ class _TranslationSetupScreenState extends State<TranslationSetupScreen> {
           child: LottieBuilder.network(
               width: 400,
               height: 400,
-              "https://raw.githubusercontent.com/xvrh/lottie-flutter/master/example/assets/Mobilo/A.json")
+              "https://lottie.host/d13717e3-a162-4a62-8554-a1df7266b2dc/QqfG3OW9e9.json")
       ) : Row(
         children: [
           // Left side - Video Preview

@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'dart:typed_data';
 import 'package:http/http.dart' as http;
-
+import 'package:dio/dio.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:media_kit/media_kit.dart';
 class TranslationService {
   static const String baseUrl = 'http://10.1.131.177:8000';
 
@@ -28,7 +30,8 @@ class TranslationService {
           'ageCategory': ageCategory,
           'subtitleCategory': subtitleCategory,
           'voiceCategory': voiceCategory,
-          'sourceLanguage':'en'
+          'sourceLanguage':'en',
+
         }),
       );
 
@@ -44,55 +47,61 @@ class TranslationService {
     }
   }
 
+
+
+
   Future<Uint8List> translateVideoUpload({
-    required Uint8List videoFile,  // Renamed from videoUrl to videoFile for clarity
+    required Uint8List videoFile,
     required String targetLanguage,
     required String ageCategory,
     required String subtitleCategory,
     required String voiceCategory,
   }) async {
     try {
-      print(targetLanguage);
-      var request = http.MultipartRequest('POST', Uri.parse('$baseUrl/video/translate/upload'));
-      request.headers.addAll({
-        'Access-Control-Allow-Origin': '*',
-        'Access-Control-Allow-Methods': 'POST, OPTIONS',
-        'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Auth-Token',
-        'content-type':'multipart/form-data'
-      });
-      print(request.headers);
-      // Add the file
-      request.files.add(
-        http.MultipartFile.fromBytes(
-          'files',  // field name that server expects
-          videoFile,
-            // Added filename
-        ),
-      );
+      // Initialize Dio
+      final dio = Dio();
 
-      // Add other fields
-      request.fields.addAll({
+      // Prepare FormData with file and additional fields
+      final formData = FormData.fromMap({
+        'files': MultipartFile.fromBytes(
+          videoFile,
+          filename: 'video.mp4',
+            contentType: MediaType('video','mp4'),
+
+        ),
         'targetLanguage': targetLanguage,
         'ageCategory': ageCategory,
         'subtitleCategory': subtitleCategory,
         'voiceCategory': voiceCategory,
       });
 
-      // Send the request
-      final streamedResponse = await request.send();
-      print(streamedResponse);
-      // Get the response as bytes
-      final response = await http.Response.fromStream(streamedResponse);
-      print(response);
+      // Send the request with onSendProgress to track progress
+      final response = await dio.post(
+        '$baseUrl/video/translate/upload',
+        data: formData,
+        options: Options(
+          contentType: 'multipart/form-data',
+          responseType: ResponseType.bytes, // Ensures raw bytes are returned
+        ),
+        onSendProgress: (sent, total) {
+          // Add progress tracking for large video files
+          final progress = (sent / total * 100).toStringAsFixed(2);
+          print('Upload progress: $progress%');
+        },
+      );
+
+      // Check response and return the video blob if successful
       if (response.statusCode == 200) {
-        return response.bodyBytes;
+        print('Upload Successful');
+        return response.data as Uint8List; // Ensure Uint8List is returned
       } else {
-        print('Error Response: ${response.body}');  // Log error response
+        print('Error Response: ${response.data}');
         throw 'Translation failed: ${response.statusCode}';
       }
     } catch (e) {
-      print('Error details: $e');  // Log error details
+      print('Error details: $e');
       throw 'Error translating video: $e';
     }
   }
+
 }

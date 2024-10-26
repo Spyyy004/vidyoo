@@ -66,13 +66,13 @@ class _PricingPageState extends State<PricingPage> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          constraints: const BoxConstraints(maxWidth: 1400),
+
           margin: const EdgeInsets.symmetric(horizontal: 40),
           child: Column(
             children: [
               _buildHeader(),
               _buildPricingSection(),
-              _buildFAQSection(),
+
             ],
           ),
         ),
@@ -333,71 +333,7 @@ class _PricingPageState extends State<PricingPage> {
     );
   }
 
-  Widget _buildFAQSection() {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 40),
-      decoration: BoxDecoration(
-        color: VidyooTheme.surface,
-        borderRadius: BorderRadius.circular(VidyooTheme.radiusL),
-      ),
-      child: Column(
-        children: [
-          Text('Frequently Asked Questions',
-              style:
-              VidyooTheme.h2.copyWith(fontWeight: FontWeight.w700)),
-          const SizedBox(height: 48),
-          Container(
-            constraints: const BoxConstraints(maxWidth: 800),
-            child: Column(
-              children: [
-                _buildFAQItem(
-                  'What payment methods do you accept?',
-                  'We accept all major credit cards, PayPal, and bank transfers for annual plans.',
-                ),
-                _buildFAQItem(
-                  'Can I switch plans later?',
-                  'Yes, you can upgrade or downgrade your plan at any time. The change will be prorated.',
-                ),
-                _buildFAQItem(
-                  'Is there a free trial?',
-                  'Yes, all plans come with a 14-day free trial. No credit card required.',
-                ),
-                _buildFAQItem(
-                  'What happens if I exceed my video processing limit?',
-                  'You can purchase additional hours or upgrade to a higher plan.',
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 
-  Widget _buildFAQItem(String question, String answer) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(VidyooTheme.radiusM),
-        border: Border.all(
-            color: VidyooTheme.textSecondary.withOpacity(0.1)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(question,
-              style: VidyooTheme.bodyLarge
-                  .copyWith(fontWeight: FontWeight.w600)),
-          const SizedBox(height: 8),
-          Text(answer,
-              style: VidyooTheme.bodyDefault
-                  .copyWith(color: VidyooTheme.textSecondary)),
-        ],
-      ),
-    );
-  }
 }
 
 class PricingPlan {

@@ -47,6 +47,7 @@ class _SignUpPromptState extends State<SignUpPrompt> {
             backgroundColor: VidyooTheme.error,
           ),
         );
+        Navigator.of(context).pop(false); // R
       }
     } finally {
       if (mounted) {

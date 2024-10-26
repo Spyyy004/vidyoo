@@ -126,6 +126,6 @@ class VidyooTheme {
 }
 
 
-late UserCredential? userCredential;
+UserCredential? userCredential = null;
 
 

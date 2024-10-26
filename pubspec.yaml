@@ -47,7 +47,8 @@ dependencies:
   video_player:
   webview_flutter:
   lottie:
-
+  dio:
+  http_parser:
 dev_dependencies:
   flutter_test:
     sdk: flutter

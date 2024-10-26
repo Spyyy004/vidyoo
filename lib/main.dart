@@ -1,12 +1,7 @@
-import 'dart:typed_data';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:vidyoo/screens/dashboard.dart';
 import 'package:vidyoo/screens/landing_screen.dart';
-import 'package:vidyoo/screens/pricing.dart';
-import 'package:vidyoo/screens/translation_settings.dart';
-import 'package:vidyoo/screens/translation_success.dart';
 import 'firebase_options.dart';
 
 Future<void> main() async {

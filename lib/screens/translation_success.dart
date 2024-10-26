@@ -2,6 +2,8 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:video_player/video_player.dart';
+import 'package:vidyoo/screens/dashboard.dart';
+import 'package:vidyoo/screens/sign_up_prompt.dart';
 import 'package:vidyoo/screens/upload.dart';
 import 'dart:html' as html;
 import '../utils/consts.dart';
@@ -48,12 +50,30 @@ class _TranslationResultScreenState extends State<TranslationResultScreen> {
   }
 
   void _downloadVideo() {
-    final blob = html.Blob([widget.videoData]);
-    final url = html.Url.createObjectUrlFromBlob(blob);
-    final anchor = html.AnchorElement(href: url)
-      ..setAttribute('download', 'translated_video.mp4')
-      ..click();
-    html.Url.revokeObjectUrl(url);
+    if(userCredential == null){
+      showDialog(context: context, builder: (context){
+        return AlertDialog(content: SignUpPrompt(videoPreviewUrl: '',),);
+      }).then((value){
+        if(value){
+          final blob = html.Blob([widget.videoData]);
+          final url = html.Url.createObjectUrlFromBlob(blob);
+          final anchor = html.AnchorElement(href: url)
+            ..setAttribute('download', 'translated_video.mp4')
+            ..click();
+          html.Url.revokeObjectUrl(url);
+          Navigator.push(context, MaterialPageRoute(builder: (context){return DashboardPage();}));
+        }
+      });
+    }
+    else{
+      final blob = html.Blob([widget.videoData]);
+      final url = html.Url.createObjectUrlFromBlob(blob);
+      final anchor = html.AnchorElement(href: url)
+        ..setAttribute('download', 'translated_video.mp4')
+        ..click();
+      html.Url.revokeObjectUrl(url);
+    }
+
   }
 
   @override
@@ -85,9 +105,9 @@ class _TranslationResultScreenState extends State<TranslationResultScreen> {
         children: [
           // Left Column - Video
           Expanded(
-            flex: 3,
+            flex: 2,
             child: Container(
-              color: Colors.black87,
+
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -97,106 +117,109 @@ class _TranslationResultScreenState extends State<TranslationResultScreen> {
                   ),
                   SizedBox(height: 24),
                   Expanded(
-                    child: Container(
-                      decoration: BoxDecoration(
-                        color: Colors.black,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: !_isInitialized
-                          ? Center(
-                        child: CircularProgressIndicator(
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                              VidyooTheme.primary),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 16.0,vertical: 16.0),
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.black,
+                          borderRadius: BorderRadius.circular(12),
                         ),
-                      )
-                          : ClipRRect(
-                        borderRadius: BorderRadius.circular(12),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            AspectRatio(
-                              aspectRatio: _controller.value.aspectRatio,
-                              child: VideoPlayer(_controller),
-                            ),
-                            // Play/Pause Overlay
-                            AnimatedOpacity(
-                              opacity:
-                              _controller.value.isPlaying ? 0.0 : 1.0,
-                              duration: Duration(milliseconds: 200),
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  color: Colors.black45,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: IconButton(
-                                  iconSize: 64,
-                                  icon: Icon(
-                                    _isPlaying
-                                        ? Icons.pause
-                                        : Icons.play_arrow,
-                                    color: Colors.white,
+                        child: !_isInitialized
+                            ? Center(
+                          child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                VidyooTheme.primary),
+                          ),
+                        )
+                            : ClipRRect(
+                          borderRadius: BorderRadius.circular(12),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              AspectRatio(
+                                aspectRatio: _controller.value.aspectRatio,
+                                child: VideoPlayer(_controller),
+                              ),
+                              // Play/Pause Overlay
+                              AnimatedOpacity(
+                                opacity:
+                                _controller.value.isPlaying ? 0.0 : 1.0,
+                                duration: Duration(milliseconds: 200),
+                                child: Container(
+                                  decoration: BoxDecoration(
+                                    color: Colors.black45,
+                                    shape: BoxShape.circle,
                                   ),
-                                  onPressed: () {
-                                    setState(() {
-                                      _isPlaying = !_isPlaying;
-                                      if (_isPlaying) {
-                                        _controller.play();
-                                      } else {
-                                        _controller.pause();
-                                      }
-                                    });
-                                  },
+                                  child: IconButton(
+                                    iconSize: 64,
+                                    icon: Icon(
+                                      _isPlaying
+                                          ? Icons.pause
+                                          : Icons.play_arrow,
+                                      color: Colors.white,
+                                    ),
+                                    onPressed: () {
+                                      setState(() {
+                                        _isPlaying = !_isPlaying;
+                                        if (_isPlaying) {
+                                          _controller.play();
+                                        } else {
+                                          _controller.pause();
+                                        }
+                                      });
+                                    },
+                                  ),
                                 ),
                               ),
-                            ),
-                            // Video Progress
-                            Positioned(
-                              bottom: 0,
-                              left: 0,
-                              right: 0,
-                              child: Container(
-                                padding: EdgeInsets.all(16),
-                                decoration: BoxDecoration(
-                                  gradient: LinearGradient(
-                                    begin: Alignment.topCenter,
-                                    end: Alignment.bottomCenter,
-                                    colors: [
-                                      Colors.transparent,
-                                      Colors.black54,
+                              // Video Progress
+                              Positioned(
+                                bottom: 0,
+                                left: 0,
+                                right: 0,
+                                child: Container(
+                                  padding: EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    gradient: LinearGradient(
+                                      begin: Alignment.topCenter,
+                                      end: Alignment.bottomCenter,
+                                      colors: [
+                                        Colors.transparent,
+                                        Colors.black54,
+                                      ],
+                                    ),
+                                  ),
+                                  child: Column(
+                                    children: [
+                                      VideoProgressIndicator(
+                                        _controller,
+                                        allowScrubbing: true,
+                                        colors: VideoProgressColors(
+                                          playedColor: VidyooTheme.primary,
+                                          bufferedColor:
+                                          Colors.white.withOpacity(0.5),
+                                          backgroundColor:
+                                          Colors.white.withOpacity(0.2),
+                                        ),
+                                      ),
+                                      SizedBox(height: 8),
+                                      ValueListenableBuilder(
+                                        valueListenable: _controller,
+                                        builder: (context,
+                                            VideoPlayerValue value, child) {
+                                          return Text(
+                                            '${_formatDuration(value.position)} / ${_formatDuration(value.duration)}',
+                                            style: VidyooTheme.bodySmall
+                                                .copyWith(
+                                                color: Colors.white),
+                                          );
+                                        },
+                                      ),
                                     ],
                                   ),
                                 ),
-                                child: Column(
-                                  children: [
-                                    VideoProgressIndicator(
-                                      _controller,
-                                      allowScrubbing: true,
-                                      colors: VideoProgressColors(
-                                        playedColor: VidyooTheme.primary,
-                                        bufferedColor:
-                                        Colors.white.withOpacity(0.5),
-                                        backgroundColor:
-                                        Colors.white.withOpacity(0.2),
-                                      ),
-                                    ),
-                                    SizedBox(height: 8),
-                                    ValueListenableBuilder(
-                                      valueListenable: _controller,
-                                      builder: (context,
-                                          VideoPlayerValue value, child) {
-                                        return Text(
-                                          '${_formatDuration(value.position)} / ${_formatDuration(value.duration)}',
-                                          style: VidyooTheme.bodySmall
-                                              .copyWith(
-                                              color: Colors.white),
-                                        );
-                                      },
-                                    ),
-                                  ],
-                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),
@@ -208,7 +231,7 @@ class _TranslationResultScreenState extends State<TranslationResultScreen> {
 
           // Right Column - Info & Actions
           Expanded(
-            flex: 2,
+            flex: 3,
             child: Container(
               padding: EdgeInsets.all(32),
               child: Column(
